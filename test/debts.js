@@ -74,6 +74,8 @@ contract('Debts', function(accounts) {
     const borrower = OWNER;
     const value = 1000;
     return Promise.resolve()
+    .then(() => debts.borrow.call(value, {from: borrower}))
+    .then(asserts.equal(false))
     .then(() => debts.borrow(value, {from: borrower}))
     .then(() => debts.debts(borrower))
     .then(asserts.equal(0));
@@ -85,6 +87,8 @@ contract('Debts', function(accounts) {
     const value = 1000;
     return Promise.resolve()
     .then(() => debts.borrow(value, {from: borrower}))
+    .then(() => debts.repay.call(borrower, value, {from: borrower}))
+    .then(asserts.equal(false))
     .then(() => debts.repay(borrower, value, {from: borrower}))
     .then(() => debts.debts(borrower))
     .then(asserts.equal(value));
@@ -98,4 +102,26 @@ contract('Debts', function(accounts) {
     .then(() => debts.borrow(value, {from: borrower}))
     .then(() => asserts.throws(debts.repay(borrower, value+1, {from: OWNER})));
   });
+  
+  it('should allow many borrow', () => {
+    const borrower = accounts[3];
+    const value = 1000;
+    return Promise.resolve()
+    .then(() => debts.borrow(value, {from: borrower}))
+    .then(() => debts.borrow(value, {from: borrower}))
+    .then(() => debts.debts(borrower))
+    .then(asserts.equal(value+value));
+  });
+  
+  it('should allow partial repay', () => {
+    const borrower = accounts[3];
+    const value = 1000;
+    const repayValue = 500;
+    return Promise.resolve()
+    .then(() => debts.borrow(value, {from: borrower}))
+    .then(() => debts.repay(borrower, repayValue, {from: OWNER}))
+    .then(() => debts.debts(borrower))
+    .then(asserts.equal(value-repayValue));
+  });
+
 });
