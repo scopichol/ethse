@@ -124,4 +124,21 @@ contract('Debts', function(accounts) {
     .then(asserts.equal(value-repayValue));
   });
 
+  it('should ignore zero borrow', () => {
+    const borrower = accounts[3];
+    const value = 1000;
+    return Promise.resolve()
+    .then(() => debts.borrow.call(0, {from: borrower}))
+    .then(asserts.equal(false));
+  });
+
+  it('should ignore zero repay', () => {
+    const borrower = accounts[3];
+    const value = 1000;
+    return Promise.resolve()
+    .then(() => debts.borrow(value, {from: borrower}))
+    .then(() => debts.repay.call(borrower,0, {from: OWNER}))
+    .then(asserts.equal(false));
+  });
+
 });
