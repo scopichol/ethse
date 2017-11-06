@@ -38,7 +38,7 @@ contract OffChainDebt {
     }
     
     function repay(address debtor, uint amount) public onlyOwner {
-        require(debt[debtor] - amount <= debt[debtor]);
+        require(debt[debtor] >= amount);
         debt[debtor] -= amount;
         RepayDebt(debtor, amount);
     }
