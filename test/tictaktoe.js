@@ -302,7 +302,7 @@ contract('TicTacToe', function(accounts) {
     //~ .then(asserts.equal(1))
   //~ });
   
-  it('should test down diag on testDiag', () => {
+  it.only('should test down diag on testDiag', () => {
     const player1 = accounts[3];
     const player2 = accounts[4];
     const value = 10;
@@ -312,21 +312,33 @@ contract('TicTacToe', function(accounts) {
     let promise = Promise.resolve()
     .then(() => tictactoe.startGame({from: player1, value: value}))
     .then(() => tictactoe.joinGame({from: player2, value: value}));
-    let currentPlayer = player1;
+    var currentPlayer = player1;
+       //~ const match = [[[1,1,"X",player1],[2,2,"O",player2],[1,0,"X",player1],[0,1,"O",player2],[2,0,"X",player1],[2,1,"O",player2]],"X"];
+         //~ promise = promise.then(() => tictactoe.setMove(match[0][0][0],match[0][0][1],{from: match[0][0][3]}));
+         //~ promise = promise.then(() => tictactoe.setMove(match[0][1][0],match[0][1][1],{from: match[0][1][3]}));
+         //~ promise = promise.then(() => tictactoe.setMove(match[0][2][0],match[0][2][1],{from: match[0][2][3]}));
+
     match[0].forEach(entry => {
-        promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}));
+        //~ promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}));
+        console.log('Iteration Player',currentPlayer);
+        console.log('Match Player',entry[3]);
+        promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
+            .then(() => {
+                if (currentPlayer == player1) {
+                    currentPlayer = player2;
+                } else {
+                    currentPlayer = player1;
+                }          
+            });
             //~ .then(result => {
                 //~ assert.equal(result.logs.length, 1);
                 //~ assert.equal(result.logs[0].event, 'SetMove');
                 //~ assert.equal(result.logs[0].args.row.valueOf(), String(entry[0]));
                 //~ assert.equal(result.logs[0].args.col.valueOf(), String(entry[1]));
             //~ });
-        console.log('Iteration');
-        if (currentPlayer === player1) {
-            currentPlayer = player2;
-        } else {
-            currentPlayer = player1;
-        }
+        //~ console.log('Iteration Player',currentPlayer);
+        //~ console.log(promise);
+        
     });
     console.log('TestDiag');
     promise = promise.then(() => tictactoe.testDiag())
