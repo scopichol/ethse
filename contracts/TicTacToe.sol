@@ -15,10 +15,10 @@ contract Tictactoe {
     event StartGame(address indexed player, uint bet);
     event JoinGame(address indexed player, uint bet);
     event SetMove(address indexed player, uint row, uint col, string sign);
-    event WinGame(address indexed player, uint prise);
+    event WinGame(address indexed player, uint prise, string sign);
     event DrawGame();
-    event LogGame(uint8 id);
-   
+    event Error(string msg);
+
     uint public fee;
 
     Game game;
@@ -28,6 +28,9 @@ contract Tictactoe {
     }
     
     function startGame() public payable {
+        if (game.player1 != address(0)) {
+            Error('StartGame player1 not empty');
+        }
         require(game.player1 == address(0));
         game.player1 = msg.sender;
         game.bet = msg.value;
@@ -35,10 +38,26 @@ contract Tictactoe {
     }
 
     function joinGame() public payable {
+        if (game.player1 == address(0)) {
+            Error('JoinGame player1 is empty');
+        }
         require(game.player1 != address(0));
+
+        if (game.player2 != address(0)) {
+            Error('JoinGame player2 not empty');
+        }
         require(game.player2 == address(0));
+
+        if (game.player1 == msg.sender) {
+            Error('JoinGame player1 is starter game');
+        }
         require(game.player1 != msg.sender);
+
+        if (game.bet > msg.value) {
+            Error('StartGame bet less than bet of player1');
+        }
         require(game.bet <= msg.value);
+
         game.player2 = msg.sender;
         game.currentPlayer = game.player1;
         game.bet += msg.value;
@@ -73,7 +92,7 @@ contract Tictactoe {
         } else {
             game.cells[_row][_col] = -1;
             game.currentPlayer = game.player1;
-            SetMove(msg.sender, _row, _col, '0');
+            SetMove(msg.sender, _row, _col, 'O');
         } 
 
         int8 probe = testRow(_row);
@@ -105,19 +124,15 @@ contract Tictactoe {
             game.player1.transfer(game.bet - game.bet2);
             game.player2.transfer(game.bet2);
             DrawGame();
-            return;
         } else if (result == 1) {
             game.player1.transfer(game.bet);
-            WinGame(game.player1, game.bet);
-            return;
+            WinGame(game.player1, game.bet, "X");
         } else if (result == -1) {
             game.player2.transfer(game.bet);
-            WinGame(game.player2, game.bet);
+            WinGame(game.player2, game.bet, "O");
         }
-        game.player1 = address(0);
-        game.player2 = address(0);
-        game.currentPlayer = address(0);
-        game.bet = 0;
+        Game memory emptyGame;
+        game = emptyGame;
     }
 
     function testRow(uint _row) public constant returns(int8) {

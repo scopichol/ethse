@@ -10,6 +10,9 @@ contract('TicTacToe', function(accounts) {
   const OWNER = accounts[0];
   const nullAddr = '0x0000000000000000000000000000000000000000';
   let tictactoe;
+  var fs=require('fs');
+  var data=fs.readFileSync('oxotestdata_r.json');
+  const matchList = JSON.parse(data);
 
   before('setup', () => {
     return TicTacToe.deployed()
@@ -241,110 +244,90 @@ contract('TicTacToe', function(accounts) {
     .then(() => asserts.throws(tictactoe.setMove(0,0,{from: player1})));
   });
   
-  //~ it('should test on testRow', () => {
-    //~ const player1 = accounts[3];
-    //~ const player2 = accounts[4];
-    //~ const value = 10;
-    //~ return Promise.resolve()
-    //~ .then(() => tictactoe.startGame({from: player1, value: value}))
-    //~ .then(() => tictactoe.joinGame({from: player2, value: value}))
-    //~ .then(() => tictactoe.setMove(0,0,{from: player1}))
-    //~ .then(() => tictactoe.setMove(1,0,{from: player2}))
-    //~ .then(() => tictactoe.testRow(0))
-    //~ .then(asserts.equal(0))
-    //~ .then(() => tictactoe.setMove(0,1,{from: player1}))
-    //~ .then(() => tictactoe.setMove(1,1,{from: player2}))
-    //~ .then(() => tictactoe.setMove(0,2,{from: player1}))
-    //~ .then(() => tictactoe.setMove(1,2,{from: player2}))
-    //~ .then(() => tictactoe.testRow(0))
-    //~ .then(asserts.equal(1))
-    //~ .then(() => tictactoe.testRow(1))
-    //~ .then(asserts.equal(-1))
-  //~ });
-  
-  //~ it('should test on testCol', () => {
-    //~ const player1 = accounts[3];
-    //~ const player2 = accounts[4];
-    //~ const value = 10;
-    //~ return Promise.resolve()
-    //~ .then(() => tictactoe.startGame({from: player1, value: value}))
-    //~ .then(() => tictactoe.joinGame({from: player2, value: value}))
-    //~ .then(() => tictactoe.setMove(0,0,{from: player1}))
-    //~ .then(() => tictactoe.setMove(0,1,{from: player2}))
-    //~ .then(() => tictactoe.testCol(0))
-    //~ .then(asserts.equal(0))
-    //~ .then(() => tictactoe.setMove(1,0,{from: player1}))
-    //~ .then(() => tictactoe.setMove(1,1,{from: player2}))
-    //~ .then(() => tictactoe.setMove(2,0,{from: player1}))
-    //~ .then(() => tictactoe.setMove(2,1,{from: player2}))
-    //~ .then(() => tictactoe.testCol(0))
-    //~ .then(asserts.equal(1))
-    //~ .then(() => tictactoe.testCol(1))
-    //~ .then(asserts.equal(-1))
-  //~ });
-  
-  //~ it('should test up diag on testDiag', () => {
-    //~ const player1 = accounts[3];
-    //~ const player2 = accounts[4];
-    //~ const value = 10;
-    //~ return Promise.resolve()
-    //~ .then(() => tictactoe.startGame({from: player1, value: value}))
-    //~ .then(() => tictactoe.joinGame({from: player2, value: value}))
-    //~ .then(() => tictactoe.setMove(0,0,{from: player1}))
-    //~ .then(() => tictactoe.setMove(0,1,{from: player2}))
-    //~ .then(() => tictactoe.testDiag())
-    //~ .then(asserts.equal(0))
-    //~ .then(() => tictactoe.setMove(1,1,{from: player1}))
-    //~ .then(() => tictactoe.setMove(1,0,{from: player2}))
-    //~ .then(() => tictactoe.setMove(2,2,{from: player1}))
-    //~ .then(() => tictactoe.setMove(2,1,{from: player2}))
-    //~ .then(() => tictactoe.testDiag())
-    //~ .then(asserts.equal(1))
-  //~ });
-  
-  it.only('should test down diag on testDiag', () => {
+  it('should have clear game after end of match', () => {
     const player1 = accounts[3];
     const player2 = accounts[4];
-    const value = 10;
-    const matchStr = '[[[1,1,"X"],[2,2,"O"],[1,0,"X"],[0,1,"O"],[2,0,"X"],[2,1,"O"]],"X"]';
+    const value = 1;
+    
+    const matchStr = '[[[1,1,"X"],[2,2,"O"],[1,0,"X"],[0,1,"O"],[2,0,"X"],[2,1,"O"],[0,0,"X"]],"X"]';
     const match = JSON.parse(matchStr);
     
     let promise = Promise.resolve()
     .then(() => tictactoe.startGame({from: player1, value: value}))
     .then(() => tictactoe.joinGame({from: player2, value: value}));
     var currentPlayer = player1;
-       //~ const match = [[[1,1,"X",player1],[2,2,"O",player2],[1,0,"X",player1],[0,1,"O",player2],[2,0,"X",player1],[2,1,"O",player2]],"X"];
-         //~ promise = promise.then(() => tictactoe.setMove(match[0][0][0],match[0][0][1],{from: match[0][0][3]}));
-         //~ promise = promise.then(() => tictactoe.setMove(match[0][1][0],match[0][1][1],{from: match[0][1][3]}));
-         //~ promise = promise.then(() => tictactoe.setMove(match[0][2][0],match[0][2][1],{from: match[0][2][3]}));
-
-    match[0].forEach(entry => {
-        //~ promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}));
-        console.log('Iteration Player',currentPlayer);
-        console.log('Match Player',entry[3]);
-        promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
-            .then(() => {
-                if (currentPlayer == player1) {
-                    currentPlayer = player2;
-                } else {
-                    currentPlayer = player1;
-                }          
-            });
-            //~ .then(result => {
-                //~ assert.equal(result.logs.length, 1);
-                //~ assert.equal(result.logs[0].event, 'SetMove');
-                //~ assert.equal(result.logs[0].args.row.valueOf(), String(entry[0]));
-                //~ assert.equal(result.logs[0].args.col.valueOf(), String(entry[1]));
-            //~ });
-        //~ console.log('Iteration Player',currentPlayer);
-        //~ console.log(promise);
-        
+    match[0].forEach((entry,idx,arr) => {
+        if (idx < arr.length-1) {
+            promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
+                .then(() => {
+                    if (currentPlayer == player1) {
+                        currentPlayer = player2;
+                    } else {
+                        currentPlayer = player1;
+                    }          
+                });
+        } else {
+            promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
+                .then(result => {
+                    assert.equal(result.logs.length, 2);
+                    assert.equal(result.logs[1].event, 'WinGame');
+                    assert.equal(result.logs[1].args.sign.valueOf(), match[1]);
+                    assert.equal(result.logs[1].args.prise.valueOf(), value*2);
+                })
+                .then(() => tictactoe.getGame({from: player1}))
+                .then(result => {
+                    assert.equal(result[1],nullAddr,"player1");
+                    assert.equal(result[2].valueOf(),0,"bet");
+                    assert.equal(result[3],nullAddr,"currentPlayer");
+                    assert.equal(result[0],nullAddr,"player1");
+                });
+        }
     });
-    console.log('TestDiag');
-    promise = promise.then(() => tictactoe.testDiag())
-    .then(asserts.equal(1));
-    
+
     return promise;
+  });
+
+
+  it.only('should have correct result for match', () => {
+    const player1 = accounts[3];
+    const player2 = accounts[4];
+    const value = 1;
+    
+    console.log(web3.eth.getBalance(accounts[5]));      
+    const matchStr = '[[[1,1,"X"],[2,2,"O"],[1,0,"X"],[0,1,"O"],[2,0,"X"],[2,1,"O"],[0,0,"X"]],"X"]';
+    const match = JSON.parse(matchStr);
+    
+    matchList.forEach(match1 => {
+        console.log(match);
+        console.log(match1);
+        let promise = Promise.resolve()
+        .then(() => tictactoe.startGame({from: player1, value: value}))
+        .then(() => tictactoe.joinGame({from: player2, value: value}))
+        .then(() => console.log("New GAme"));
+        var currentPlayer = player1;
+        match[0].forEach((entry,idx,arr) => {
+            if (idx == arr.length-1) {
+                promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
+                    .then(result => {
+                        assert.equal(result.logs.length, 2);
+                        assert.equal(result.logs[1].event, 'WinGame');
+                        assert.equal(result.logs[1].args.sign.valueOf(), match[1]);
+                        assert.equal(result.logs[1].args.prise.valueOf(), value*2);
+                    });
+            } else {
+                promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
+                    .then(() => {
+                        if (currentPlayer == player1) {
+                            currentPlayer = player2;
+                        } else {
+                            currentPlayer = player1;
+                        }          
+                    });
+            }
+        });
+    
+        return promise;
+    });
   });
   
 });
