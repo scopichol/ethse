@@ -82,25 +82,25 @@ contract Tictactoe {
     function setMove(uint8 _row, uint8 _col) public {
         if (game.currentPlayer == address(0)) {
             Error('JoinGame currentPlayer is null');
-            return;
+            //~ return;
         }
         require(game.currentPlayer != address(0));
         
         if (game.currentPlayer != msg.sender) {
             Error('JoinGame currentPlayer is not self move');
-            return;
+            //~ return;
         }
         require(game.currentPlayer == msg.sender);
         
         if (_row>2 || _col>2) {
             Error('JoinGame wrong cell');
-            return;
+            //~ return;
         }
         require(_row<=2 && _col<=2);
         
         if (game.cells[_row][_col]!=0) {
             Error('JoinGame is not empty cell');
-            return;
+            //~ return;
         }
         require(game.cells[_row][_col]==0);
 
