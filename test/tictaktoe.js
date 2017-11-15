@@ -337,7 +337,6 @@ contract('TicTacToe', function(accounts) {
                 promise = promise.then(() =>console.log('MOVE TO',entry[0],entry[1]))
                     .then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
                     .then(result => {
-                        console.log('RESULT',result);
                         console.log('EVENT',result.logs[0].event);
                         if (result.logs[0].event == 'Error') {
                             console.log('MSG',result.logs[0].args.errstr);
