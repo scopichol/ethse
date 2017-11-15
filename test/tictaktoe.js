@@ -291,31 +291,69 @@ contract('TicTacToe', function(accounts) {
   it.only('should have correct result for match', () => {
     const player1 = accounts[3];
     const player2 = accounts[4];
-    const value = 1;
+    const value = web3.toWei(1);
     
-    console.log(web3.eth.getBalance(accounts[5]));      
     const matchStr = '[[[1,1,"X"],[2,2,"O"],[1,0,"X"],[0,1,"O"],[2,0,"X"],[2,1,"O"],[0,0,"X"]],"X"]';
     const match = JSON.parse(matchStr);
+    var promise = Promise.resolve()
+    var currentPlayer = player1;
     
-    matchList.forEach(match1 => {
-        console.log(match);
-        console.log(match1);
-        let promise = Promise.resolve()
-        .then(() => tictactoe.startGame({from: player1, value: value}))
+    matchList.forEach((match1,idxMain,arrMain) => {
+        //~ console.log(match);
+        //~ console.log(match1);
+        //~ var promise = Promise.resolve()
+      //~ promise = promise.then(() => tictactoe.getGame({from: player1}))
+      //~ .then(result => console.log(result));
+      promise = promise.then(() => tictactoe.startGame({from: player1, value: value}))
         .then(() => tictactoe.joinGame({from: player2, value: value}))
-        .then(() => console.log("New GAme"));
-        var currentPlayer = player1;
-        match[0].forEach((entry,idx,arr) => {
+        .then(() => tictactoe.getGame({from: player1}))
+        .then(result => console.log('ITERATION',idxMain,result))
+        .then(() =>{currentPlayer = player1;})
+        .then(() => console.log("New GAme",currentPlayer, player2))
+        .then(() => tictactoe.getCell(0,0,{from: player1}))
+        .then(result => console.log('CELL',0,0,'VALUE',result.valueOf()))
+        .then(() => tictactoe.getCell(0,1,{from: player1}))
+        .then(result => console.log('CELL',0,1,'VALUE',result.valueOf()))
+        .then(() => tictactoe.getCell(0,2,{from: player1}))
+        .then(result => console.log('CELL',0,2,'VALUE',result.valueOf()))
+        .then(() => tictactoe.getCell(1,0,{from: player1}))
+        .then(result => console.log('CELL',1,0,'VALUE',result.valueOf()))
+        .then(() => tictactoe.getCell(1,1,{from: player1}))
+        .then(result => console.log('CELL',1,1,'VALUE',result.valueOf()))
+        .then(() => tictactoe.getCell(1,2,{from: player1}))
+        .then(result => console.log('CELL',1,2,'VALUE',result.valueOf()))
+        .then(() => tictactoe.getCell(2,0,{from: player1}))
+        .then(result => console.log('CELL',2,0,'VALUE',result.valueOf()))
+        .then(() => tictactoe.getCell(2,1,{from: player1}))
+        .then(result => console.log('CELL',2,1,'VALUE',result.valueOf()))
+        .then(() => tictactoe.getCell(2,2,{from: player1}))
+        .then(result => console.log('CELL',2,2,'VALUE',result.valueOf()))
+          ;
+        match1[0].forEach((entry,idx,arr) => {
             if (idx == arr.length-1) {
-                promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
+                promise = promise.then(() => {
+                    console.log('Balance before end', web3.eth.getBalance(player1).valueOf());  
+                });
+                promise = promise.then(() =>console.log('MOVE TO',entry[0],entry[1]))
+                    .then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
                     .then(result => {
+                        console.log('RESULT',result);
+                        console.log('EVENT',result.logs[0].event);
+                        if (result.logs[0].event == 'Error') {
+                            console.log('MSG',result.logs[0].args.errstr);
+                        }
                         assert.equal(result.logs.length, 2);
                         assert.equal(result.logs[1].event, 'WinGame');
                         assert.equal(result.logs[1].args.sign.valueOf(), match[1]);
                         assert.equal(result.logs[1].args.prise.valueOf(), value*2);
-                    });
+                    })
+                promise = promise.then(() => {
+                    console.log('Balance after end', web3.eth.getBalance(player1).valueOf());  
+                });
             } else {
-                promise = promise.then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
+                promise = promise.then(() =>console.log('MOVE TO',entry[0],entry[1]))
+                    .then(() => tictactoe.setMove(entry[0],entry[1],{from: currentPlayer}))
+                    .then(console.log("Move",idx))
                     .then(() => {
                         if (currentPlayer == player1) {
                             currentPlayer = player2;
@@ -329,5 +367,6 @@ contract('TicTacToe', function(accounts) {
         return promise;
     });
   });
+
   
 });

@@ -3,7 +3,7 @@ pragma solidity ^0.4.15;
 contract Tictactoe {
     
     struct Game {
-        mapping(uint=>mapping(uint => int8)) cells;
+        mapping(uint8=>mapping(uint8 => int8)) cells;
         address player1;
         address player2;
         uint bet;
@@ -17,7 +17,7 @@ contract Tictactoe {
     event SetMove(address indexed player, uint row, uint col, string sign);
     event WinGame(address indexed player, uint prise, string sign);
     event DrawGame();
-    event Error(string msg);
+    event Error(string errstr);
 
     uint public fee;
 
@@ -74,15 +74,34 @@ contract Tictactoe {
      
             //return (game.player1, game.player2, game.bet, game.currentPlayer);
     
-    function getCell(uint row, uint col) public constant returns(int8){
+    function getCell(uint8 row, uint8 col) public constant returns(int8){
         return game.cells[row][col];
     }
     
     
-    function setMove(uint _row, uint _col) public {
+    function setMove(uint8 _row, uint8 _col) public {
+        if (game.currentPlayer == address(0)) {
+            Error('JoinGame currentPlayer is null');
+            return;
+        }
         require(game.currentPlayer != address(0));
+        
+        if (game.currentPlayer != msg.sender) {
+            Error('JoinGame currentPlayer is not self move');
+            return;
+        }
         require(game.currentPlayer == msg.sender);
+        
+        if (_row>2 || _col>2) {
+            Error('JoinGame wrong cell');
+            return;
+        }
         require(_row<=2 && _col<=2);
+        
+        if (game.cells[_row][_col]!=0) {
+            Error('JoinGame is not empty cell');
+            return;
+        }
         require(game.cells[_row][_col]==0);
 
         if (msg.sender == game.player1) {
@@ -133,9 +152,14 @@ contract Tictactoe {
         }
         Game memory emptyGame;
         game = emptyGame;
+        for (uint8 i =0;i<3;i++) {
+            for(uint8 j=0;j<3;j++){
+                game.cells[i][j] = 0;
+            }
+        }
     }
 
-    function testRow(uint _row) public constant returns(int8) {
+    function testRow(uint8 _row) public constant returns(int8) {
         int8 rowSum = game.cells[_row][0] + game.cells[_row][1] + game.cells[_row][2];
 
         if ( rowSum == -3 ) {
@@ -147,7 +171,7 @@ contract Tictactoe {
         return 0;
     }
     
-    function testCol(uint _col) public constant returns(int8) {
+    function testCol(uint8 _col) public constant returns(int8) {
         int8 colSum = game.cells[0][_col] + game.cells[1][_col] + game.cells[2][_col];
 
         if ( colSum == -3 ) {
