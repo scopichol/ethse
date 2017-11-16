@@ -22,36 +22,49 @@ contract Tictactoe {
     uint public fee;
 
     Game game;
+
+    modifier mustEmptyPlayer(address player) {
+        if (player != address(0)) {
+            Error('player not empty');
+        }
+        require(player == address(0));
+        _;
+    }
+    modifier needPlayer(address player) {
+        if (player == address(0)) {
+            Error('player is empty');
+        }
+        require(player != address(0));
+        _;
+    }
+    modifier notPlayer(address player) {
+        if (player == msg.sender) {
+            Error('User is not player');
+        }
+        require(player != msg.sender);
+        _;
+    }
+
+    modifier isPlayer(address player) {
+        if (player != msg.sender) {
+            Error('Juser is player');
+            //~ return;
+        }
+        require(player == msg.sender);
+        _;
+    }
     
     function Tictactoe(uint _fee) public {
         fee = _fee;
     }
     
-    function startGame() public payable {
-        if (game.player1 != address(0)) {
-            Error('StartGame player1 not empty');
-        }
-        require(game.player1 == address(0));
+    function startGame() mustEmptyPlayer(game.player1) public payable {
         game.player1 = msg.sender;
         game.bet = msg.value;
         StartGame(msg.sender, msg.value);
     }
 
-    function joinGame() public payable {
-        if (game.player1 == address(0)) {
-            Error('JoinGame player1 is empty');
-        }
-        require(game.player1 != address(0));
-
-        if (game.player2 != address(0)) {
-            Error('JoinGame player2 not empty');
-        }
-        require(game.player2 == address(0));
-
-        if (game.player1 == msg.sender) {
-            Error('JoinGame player1 is starter game');
-        }
-        require(game.player1 != msg.sender);
+    function joinGame() needPlayer(game.player1) mustEmptyPlayer(game.player2) notPlayer(game.player1) public payable {
 
         if (game.bet > msg.value) {
             Error('StartGame bet less than bet of player1');
@@ -78,20 +91,22 @@ contract Tictactoe {
         return game.cells[row][col];
     }
     
+    function probeWinner(uint8 _row, uint8 _col) private returns(int8) {
+        int8 probe = testRow(_row);
+        if ( probe != 0 ) {
+            return probe;
+        }
+        probe = testCol(_col);
+        if ( probe != 0 ) {
+            return probe;
+        }
+        if ( _row == _col || _row == 2-_col) {
+            return testDiag();
+        }
+        return 0;
+    }
     
-    function setMove(uint8 _row, uint8 _col) public {
-        if (game.currentPlayer == address(0)) {
-            Error('JoinGame currentPlayer is null');
-            //~ return;
-        }
-        require(game.currentPlayer != address(0));
-        
-        if (game.currentPlayer != msg.sender) {
-            Error('JoinGame currentPlayer is not self move');
-            //~ return;
-        }
-        require(game.currentPlayer == msg.sender);
-        
+    function setMove(uint8 _row, uint8 _col) needPlayer(game.currentPlayer) isPlayer(game.currentPlayer) public {
         if (_row>2 || _col>2) {
             Error('JoinGame wrong cell');
             //~ return;
@@ -114,28 +129,43 @@ contract Tictactoe {
             SetMove(msg.sender, _row, _col, 'O');
         } 
 
-        int8 probe = testRow(_row);
+        int8 probe = probeWinner(_row, _col);
         if ( probe != 0 ) {
             gameOver(probe);
             return;
-        }
-        probe = testCol(_col);
-        if ( probe != 0 ) {
-            gameOver(probe);
-            return;
-        }
-        if ( _row == _col || _row == 2-_col) {
-            probe = testDiag();
-            if ( probe != 0 ) {
-                gameOver(probe);
-                return;
-            }
         }
 
         game.moveCount += 1;
         if (game.moveCount == 9) {
             gameOver(0);
         }
+        else if (game.moveCount == 8) {
+            uint8 empty_i = 50;
+            uint8 empty_j = 50;
+            for (uint8 i=0; i<3; i++) {
+                for (uint8 j=0; j<3; j++) {
+                    if (game.cells[i][j] == 0) {
+                        empty_i = i;
+                        empty_j = j;
+                    }                        
+                }
+            }
+            SetMove(msg.sender, empty_i, empty_j, '');
+            if (empty_i == 50) {
+                return;
+            }
+            //~ if (game.currentPlayer == game.player1) {
+                //~ game.cells[empty_i][empty_j] = 1;
+            //~ } else {
+                //~ game.cells[empty_i][empty_j] = -1;
+            //~ }
+            game.cells[empty_i][empty_j] =1;
+            //~ if (probeWinner(_row, _col) == 0) {
+                //~ gameOver(0);
+            //~ } else {
+                //~ game.cells[empty_i][empty_j] = 0;
+            //~ }
+        }            
     }
     
     function gameOver(int8 result) public {

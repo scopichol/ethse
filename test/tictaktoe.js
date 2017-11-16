@@ -11,7 +11,7 @@ contract('TicTacToe', function(accounts) {
   const nullAddr = '0x0000000000000000000000000000000000000000';
   let tictactoe;
   var fs=require('fs');
-  var data=fs.readFileSync('oxotestdata_r_full.json');
+  var data=fs.readFileSync('oxotestdata_r_4.json');
   const matchList = JSON.parse(data);
 
   before('setup', () => {
@@ -287,10 +287,6 @@ contract('TicTacToe', function(accounts) {
     return promise;
   });
 
-    //~ it.only('should return $n+1', function(n){
-        //~ console.log('hhh');
-    //~ },[ 1, 2, 3]);
-
     matchList.forEach((match,idxMain,arrMain) => {
     
   it('should have correct result for match '+idxMain, () => {
@@ -301,14 +297,8 @@ contract('TicTacToe', function(accounts) {
     var promise = Promise.resolve()
     var currentPlayer = player1;
       
-    //~ var match = matchList[0];
-    //~ var idxMain = 1;
-    //~ var arrMain = matchList;
-      
-    //~ matchList.forEach((match,idxMain,arrMain) => {
       promise = promise.then(() => tictactoe.startGame({from: player1, value: value}))
         .then(() => tictactoe.joinGame({from: player2, value: value}))
-        //~ .then(() => console.log('MATCH',idxMain))
         .then(() =>{currentPlayer = player1;});
         match[0].forEach((entry,idx,arr) => {
             if (idx == arr.length-1) {
@@ -344,8 +334,7 @@ contract('TicTacToe', function(accounts) {
         });
     
         return promise;
-    //~ });
-  });
+    });
 
   });
 });
