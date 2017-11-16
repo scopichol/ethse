@@ -293,7 +293,7 @@ contract('TicTacToe', function(accounts) {
 
     matchList.forEach((match,idxMain,arrMain) => {
     
-  it('should have correct result for match', () => {
+  it('should have correct result for match '+idxMain, () => {
     const player1 = accounts[3];
     const player2 = accounts[4];
     const value = 1000;//web3.toWei(1);
@@ -308,7 +308,7 @@ contract('TicTacToe', function(accounts) {
     //~ matchList.forEach((match,idxMain,arrMain) => {
       promise = promise.then(() => tictactoe.startGame({from: player1, value: value}))
         .then(() => tictactoe.joinGame({from: player2, value: value}))
-        .then(() => console.log('MATCH',idxMain))
+        //~ .then(() => console.log('MATCH',idxMain))
         .then(() =>{currentPlayer = player1;});
         match[0].forEach((entry,idx,arr) => {
             if (idx == arr.length-1) {
