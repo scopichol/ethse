@@ -150,21 +150,15 @@ contract Tictactoe {
                     }                        
                 }
             }
-            SetMove(msg.sender, empty_i, empty_j, '');
             if (empty_i == 50) {
                 return;
             }
-            //~ if (game.currentPlayer == game.player1) {
-                //~ game.cells[empty_i][empty_j] = 1;
-            //~ } else {
-                //~ game.cells[empty_i][empty_j] = -1;
-            //~ }
-            //~ game.cells[empty_i][empty_j] =1;
-            //~ if (probeWinner(_row, _col) == 0) {
-                //~ gameOver(0);
-            //~ } else {
-                //~ game.cells[empty_i][empty_j] = 0;
-            //~ }
+            game.cells[empty_i][empty_j] = 1;
+            if (probeWinner(empty_i, empty_j) == 0) {
+                gameOver(0);
+            } else {
+                game.cells[empty_i][empty_j] = 0;
+            }
         }            
     }
     
