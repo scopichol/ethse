@@ -142,8 +142,8 @@ contract Tictactoe {
         else if (game.moveCount == 8) {
             uint8 empty_i = 50;
             uint8 empty_j = 50;
-            for (uint8 i=0; i<3; i++) {
-                for (uint8 j=0; j<3; j++) {
+            for (uint8 i=0; i<3 && empty_i == 50; i++) {
+                for (uint8 j=0; j<3 && empty_j == 50; j++) {
                     if (game.cells[i][j] == 0) {
                         empty_i = i;
                         empty_j = j;
@@ -159,7 +159,7 @@ contract Tictactoe {
             //~ } else {
                 //~ game.cells[empty_i][empty_j] = -1;
             //~ }
-            game.cells[empty_i][empty_j] =1;
+            //~ game.cells[empty_i][empty_j] =1;
             //~ if (probeWinner(_row, _col) == 0) {
                 //~ gameOver(0);
             //~ } else {
