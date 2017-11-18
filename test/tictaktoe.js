@@ -11,7 +11,7 @@ contract('TicTacToe', function(accounts) {
   const nullAddr = '0x0000000000000000000000000000000000000000';
   let tictactoe;
   var fs=require('fs');
-  var data=fs.readFileSync('oxotestdata_r_4.json');
+  var data=fs.readFileSync('oxotestdata_r_full.json');
   const matchList = JSON.parse(data);
 
   before('setup', () => {
